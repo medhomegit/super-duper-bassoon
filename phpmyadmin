@@ -1,0 +1,103 @@
+name: internalIP
+      value: $(ref.wordpress-1-vm.networkInterfaces[0].networkIP)
+    - finalValue: 34.70.229.220
+      name: ip
+      value: $(ref.wordpress-1-vm.networkInterfaces[0].accessConfigs[0].natIP)
+    properties:
+      bootDiskSizeGb: 10
+      bootDiskType: pd-standard
+      canIpForward: false
+      diskType: pd-standard
+      disks: []
+      externalIPs:
+      - EPHEMERAL
+      instanceName: wordpress-1-vm
+      localSSDs: 0
+      machineType: g1-small
+      metadata:
+        items:
+        - key: wordpress-mysql-password
+          value: $(ref.generated-password-0.password)
+        - key: mysql-root-password
+          value: $(ref.generated-password-1.password)
+        - key: wordpress-admin-password
+          value: $(ref.generated-password-2.password)
+        - key: status-config-url
+          value: $(ref.software-status.config-url)
+        - key: status-variable-path
+          value: $(ref.software-status.variable-path)
+        - key: status-uptime-deadline
+          value: 300
+        - key: installphpmyadmin
+          value: 'True'
+        - key: wordpress-admin-email
+          value: shannonmae@aprnhome.com
+        - key: google-logging-enable
+          value: 1
+        - key: google-monitoring-enable
+          value: 1
+      networks:
+      - https://www.googleapis.com/compute/v1/projects/med-home-apis-work/global/networks/default
+      noScope: false
+      provideBoot: true
+      serviceAccounts:
+      - email: default
+        scopes:
+        - https://www.googleapis.com/auth/cloud.useraccounts.readonly
+        - https://www.googleapis.com/auth/devstorage.read_only
+        - https://www.googleapis.com/auth/logging.write
+        - https://www.googleapis.com/auth/monitoring.write
+        - https://www.googleapis.com/auth/cloudruntimeconfig
+      sourceImage: https://www.googleapis.com/compute/v1/projects/click-to-deploy-images/global/images/wordpress-v20200817
+      subnetworks:
+      - https://www.googleapis.com/compute/v1/projects/med-home-apis-work/regions/us-central1/subnetworks/default
+      tags:
+        items:
+        - wordpress-1-deployment
+      zone: us-central1-f
+    resources:
+    - name: wordpress-1-vm
+      type: compute.v1.instance
+    type: vm_instance.py
+  - name: generated-password-0
+    outputs:
+    - finalValue: Mzk68KDm
+      name: password
+      value: Mzk68KDm
+    type: password.py
+  - name: generated-password-1
+    outputs:
+    - finalValue: SDeZKfahF4eUyZ
+      name: password
+      value: SDeZKfahF4eUyZ
+    type: password.py
+  - name: generated-password-2
+    outputs:
+    - finalValue: Qw5b-4wG
+      name: password
+      value: Qw5b-4wG
+    type: password.py
+  - name: software-status
+    outputs:
+    - finalValue: https://runtimeconfig.googleapis.com/v1beta1/projects/med-home-apis-work/configs/wordpress-1-config
+      name: config-url
+      value: https://runtimeconfig.googleapis.com/v1beta1/projects/med-home-apis-work/configs/wordpress-1-config
+    - finalValue: status
+      name: variable-path
+      value: status
+    properties:
+      timeout: 300
+      waiterDependsOn:
+      - wordpress-1-vm
+    resources:
+    - name: wordpress-1-config
+      type: runtimeconfig.v1beta1.config
+    - name: wordpress-1-software
+      type: runtimeconfig.v1beta1.waiter
+    type: software_status.py
+  - name: wordpress-1-tcp-80
+    type: compute.v1.firewall
+  - name: wordpress-1-tcp-443
+    type: compute.v1.firewall
+  type: wordpress.jinja
+
